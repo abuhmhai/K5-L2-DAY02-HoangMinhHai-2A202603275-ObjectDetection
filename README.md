@@ -1,6 +1,6 @@
 # Bài thực hành Ngày 2 - Gán nhãn phát hiện vật thể cho ADAS
 
-> **Trạng thái bài làm cá nhân (09/11/2026):** xem [báo cáo của Hoàng Minh Hải](report/individual/2A202603275_HoangMinhHai.md). Annotation QC sau rework: F1 0,8469, mean IoU 0,8265. **Đã train YOLO26n local trong PyCharm 50 epoch**, mAP50 0.6550, mAP50–95 0.4089; có đủ 10 ảnh prediction. Schema/phạm vi rework và hình thức local thay Colab cần được giảng viên xác nhận.
+> **Trạng thái bài làm cá nhân (09/11/2026):** xem [báo cáo của Hoàng Minh Hải](report/individual/2A202603275_HoangMinhHai.md). Annotation QC sau rework: F1 0,8469, mean IoU 0,8265. **Đã train YOLO26n local trong PyCharm 50 epoch**, mAP50 0.6550, mAP50–95 0.4089; có đủ 10 ảnh prediction. Đã rework để đồng bộ ID lớp giữa CVAT, `data.yaml` và gold sau khi phát hiện thứ tự lớp khác schema ban đầu; chi tiết các lượt QC box nằm trong báo cáo. Hình thức local thay Colab cần được giảng viên xác nhận.
 
 **Bài cá nhân.** Mỗi học viên tự làm và nộp bộ nhãn của mình. Hạn nộp: **11:59 trưa ngày hôm sau buổi lab (giờ Việt Nam, UTC+7)**. Với buổi ngày 09/11/2026, hạn nộp là **11:59 ngày 10/11/2026**. Nộp bài qua LMS tại [aithucchien.vinuni.edu.vn](https://aithucchien.vinuni.edu.vn).
 

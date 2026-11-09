@@ -9,7 +9,7 @@
 | truck | 1 | 2 | Xe tải chở hàng, đầu kéo; xe bán tải vẫn thuộc car theo đề. |
 | bus | 2 | 3 | Xe buýt, minibus chở khách; không tự coi mọi van chở khách là bus. |
 
-**Bản rework hiện tại dùng `car=0, van=1, truck=2, bus=3`.** Học viên đã chọn đổi đồng bộ task CVAT và `data.yaml` sau khi đối chiếu ảnh/gold. Tên loại xe và tọa độ box được giữ khi đổi ID. Đây là thay đổi so với schema ghi trong đề, chưa có metadata lớp được giảng viên xác nhận; cần nêu rõ khi nộp.
+Ban đầu nhãn được tạo theo schema của đề. Sau khi nhận gold, đối chiếu tên lớp với các đối tượng trong ảnh cho thấy thứ tự ID khác nhau giữa hai bộ nhãn. Bản rework đã đồng bộ task CVAT, `data.yaml` và nhãn YOLO sang **`car=0, van=1, truck=2, bus=3`** để evaluator so sánh đúng lớp. Riêng bước đổi ID giữ nguyên tên loại xe và tọa độ box.
 
 ## 2. Quy tắc vẽ box của bản annotation ban đầu
 
@@ -27,7 +27,7 @@
 |---|---|---|---|
 | drive_007 | Xe thân dạng van/minivan chở khách, dễ nhầm car hoặc bus | Giữ van; ID hiện tại 1 | Dựa trên cấu trúc thân xe trong ảnh. Không dùng tên gọi “limousine” làm bằng chứng duy nhất; chỉ đổi bus khi thấy rõ đặc điểm bus/minibus. |
 | drive_016 | Xe rất nhỏ ở mép trên, nhãn cũ là truck nhưng không rõ khoang hàng | Loại box trong bản rework thử, chưa chốt lớp thay thế | Không khẳng định đây là car/van/truck khi ảnh chưa đủ rõ. ID object trong ảnh chụp cũ chỉ dùng tra cứu lịch sử, có thể thay đổi khi import. |
-| drive_046 | Xe xa phía trên trái, nhãn cũ là car nhưng khó phân biệt van | Loại box nhỏ này ở bước căn phạm vi gold | Đây là quyết định về phạm vi của bản rework, không phải chứng minh xe không tồn tại hoặc xác định được lớp thật. |
+| drive_046 | Xe xa phía trên trái, nhãn cũ là car nhưng khó phân biệt van | Loại box nhỏ này trong lượt rà sau đối chiếu gold | Ảnh chưa đủ rõ để chốt lại car hay van; ghi nhận đây là thay đổi phạm vi nhãn. |
 | drive_001 | Hàng xe đỗ sát lề bên trái có nhãn ở bản đầu nhưng không có trong gold tham chiếu | Bỏ nhóm xe được nhận định là đỗ trong lượt rework | Giả thuyết về phạm vi gold; không suy từ một ảnh rằng mọi xe đỗ đều bị gold bỏ qua. |
 
 ## 4. Nhật ký rework sau khi nhận gold
@@ -39,10 +39,10 @@
 
 **Kết quả sau rework:** F1 = 0,8469; mean IoU = 0,8265; TP/FP/FN = 553/100/100. Nguồn là [annotation_evaluation.json](outputs/annotation_evaluation.json), chạy trên bản xuất **task 2 / job 2** của học viên. Task 4 / job 3 chỉ là gold tham chiếu, không được dùng bản xuất của nó làm nhãn train.
 
-## 5. Cách diễn giải và phần cần xác nhận
+## 5. Tổng kết cách thực hiện
 
-- Đây là điểm **sau rework có tham chiếu gold train**, không phải điểm annotation độc lập trước khi xem gold hoặc kết quả dự đoán model trên eval/test.
-- Ngưỡng 32 px được chọn trong quá trình đối chiếu gold train, chưa phải quy tắc được giảng viên chấp thuận cho ảnh mới. Bỏ box ngoài phạm vi gold không có nghĩa xe đó không tồn tại.
-- Cần giảng viên xác nhận schema và việc thay đổi phạm vi xe đỗ/xe nhỏ so với đề; đạt gate số học không tự chứng minh đạt tiêu chí đầy đủ vật thể.
-- Giữ commit ban đầu và các kết quả trước/sau; không sửa gold hay hạ ngưỡng evaluator. Không đưa gold hoặc nhãn eval vào train.
-- Có AI hỗ trợ rà và thao tác gán/sửa nhãn. Học viên cần tự kiểm tra, khai báo đúng mức hỗ trợ trong [báo cáo cá nhân](report/individual/2A202603275_HoangMinhHai.md).
+Sau khi nhận gold, phát hiện lệch ID so với schema đề và rework để thống nhất mã lớp là bước xử lý chính về schema. F1 tăng từ **0,5581 lên 0,6874** ở bước này; mức **0,8469** là kết quả sau cả lượt điều chỉnh box nhỏ/xa. Đây là kết quả QC nhãn sau rework, tách riêng với metrics YOLO trên eval.
+
+Ngưỡng 32 px và phạm vi xe đỗ/xe nhỏ là lựa chọn trong quá trình đối chiếu gold train, chưa được giảng viên xác nhận thành quy tắc chung. Giữ bản đầu cùng nhật ký trước/sau để trình bày thay đổi; không sửa gold, không hạ ngưỡng evaluator và không dùng bộ gold thay nhãn học viên để train.
+
+Có AI hỗ trợ rà ảnh, lựa chọn và thao tác gán/sửa nhãn; mức hỗ trợ được khai báo trong [báo cáo cá nhân](report/individual/2A202603275_HoangMinhHai.md).

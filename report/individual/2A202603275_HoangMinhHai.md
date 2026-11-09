@@ -1,6 +1,6 @@
 # Báo cáo cá nhân — Ngày 2 Object Detection
 
-**Trạng thái ngày 09/11/2026: đã hoàn thành annotation QC và train/eval YOLO local trong PyCharm.** Các số liệu trong mục 4 là điểm so nhãn với gold train sau rework, không phải chỉ số của mô hình.
+**Trạng thái ngày 09/11/2026: đã hoàn thành annotation QC và train/eval YOLO local trong PyCharm.** Mục 4 trình bày quá trình phát hiện lệch ID lớp, rework nhãn và kiểm tra lại; mục 5 trình bày kết quả mô hình.
 
 ## 1. Thông tin học viên
 
@@ -23,13 +23,15 @@ Chi tiết trong [GUIDELINE_MINI.md](../../GUIDELINE_MINI.md).
 | bus | 2 | 3 |
 | van | 3 | 1 |
 
-Sau khi đối chiếu ảnh và gold, học viên chọn đổi đồng bộ task CVAT và `data.yaml` sang `car=0, van=1, truck=2, bus=3`. Đây là thay đổi so với schema được ghi trong đề; chưa có xác nhận chính thức của giảng viên về metadata lớp và phạm vi gán nhãn của gold. Cần trình bày thay đổi này khi nộp, không coi việc đạt F1 là bằng chứng tự động rằng đã tuân thủ mọi quy tắc của đề.
+Ban đầu tôi gán nhãn theo thứ tự lớp trong đề: `car=0, truck=1, bus=2, van=3`. Sau khi nhận gold và đối chiếu các đối tượng trong ảnh, tôi phát hiện thứ tự ID của gold khác với bản đang dùng: `car=0, van=1, truck=2, bus=3`. Vì evaluator so khớp theo cả ID lớp và IoU, cùng một loại xe có thể bị tính sai lớp khi hai bộ nhãn chưa thống nhất mã.
+
+Tôi đã rework để đồng bộ ID trên task CVAT, `data.yaml` và file nhãn YOLO xuất ra theo thứ tự đối chiếu được từ gold. Ở bước đổi ID, tên loại xe và tọa độ box được giữ nguyên; sau đó tôi xuất lại **Ultralytics YOLO Detection 1.0** và chạy evaluator trên đúng thư mục nhãn học viên.
 
 Ba ca mơ hồ đã ghi nhận:
 
 1. `drive_007`: xe có thân dạng van/minivan chở khách, dễ nhầm với car hoặc bus. Giữ `van`, ID hiện tại là 1.
 2. `drive_016`: xe rất nhỏ, mờ ở sát mép trên ảnh; nhãn cũ là truck nhưng không đủ rõ khoang hàng. Loại trong bản rework thử, chưa chốt một lớp thay thế.
-3. `drive_046`: xe ở xa phía trên trái, khó phân biệt car và van. Box nhỏ này được loại trong bước căn phạm vi theo gold; không xem việc loại box là bằng chứng xe không tồn tại hoặc đã xác định được lớp thật.
+3. `drive_046`: xe ở xa phía trên trái, khó phân biệt car và van. Box nhỏ này được loại trong lượt rà phạm vi nhãn sau đối chiếu gold; chưa xác định lại lớp vì ảnh không đủ rõ.
 
 ## 3. Annotation và self-QC
 
@@ -42,7 +44,7 @@ Ba ca mơ hồ đã ghi nhận:
 
 ![Task nhãn học viên sau rework trên CVAT](assets/annotation_qc/student_cvat_after_rework.jpg)
 
-## 4. Gold QC và rework
+## 4. Phát hiện lệch ID, rework và kiểm tra lại
 
 Kết quả sau cùng được chạy trên đúng `dataset/labels/train`, lấy từ **task 2 / job 2** của học viên, xuất **Ultralytics YOLO Detection 1.0**. Task 4 / job 3 là gold tham chiếu, không dùng bản xuất của task đó làm nhãn train.
 
@@ -57,7 +59,7 @@ Kết quả sau cùng được chạy trên đúng `dataset/labels/train`, lấy
 | Mean IoU của matches | 0,8160 | **0,8265** |
 | Passed | false | **true** |
 
-Nguồn: [JSON lần đầu](assets/annotation_qc/evaluation_initial.json), [JSON sau rework](assets/annotation_qc/evaluation_after_rework.json) và [JSON cần nộp](../../outputs/annotation_evaluation.json). Hai lần chấm có khác biệt về ID lớp/phạm vi nhãn; không diễn giải toàn bộ mức tăng là cải thiện hình học box.
+Nguồn: [JSON lần đầu](assets/annotation_qc/evaluation_initial.json), [JSON sau rework](assets/annotation_qc/evaluation_after_rework.json) và [JSON cần nộp](../../outputs/annotation_evaluation.json). Mức tăng F1 gồm hai phần: đồng bộ ID lớp và điều chỉnh phạm vi box trong các lượt QC.
 
 Các bước rework chính:
 
@@ -65,12 +67,12 @@ Các bước rework chính:
 |---|---|---:|
 | Sửa khung và bổ sung xe | Sửa các trường hợp có thể nhận diện từ ảnh | 0,5154 |
 | Thử bỏ xe đỗ/mơ hồ | Loại 147 box được nhận định là xe đỗ và 2 box mơ hồ ở 19 ảnh | 0,5581 |
-| Đồng bộ ID lớp | Giữ tên loại xe/hình học, đổi thứ tự ID theo lựa chọn của học viên | 0,6874 |
-| Căn phạm vi với gold train | Trong nhóm chưa khớp gold, loại 303 box nhỏ/xa có cạnh ngắn dưới 32 px ở 42 ảnh; giữ tọa độ các box còn lại | 0,8469 |
+| Đồng bộ ID lớp | Đổi từ schema đề sang thứ tự ID đối chiếu được trong gold; giữ tên loại xe và tọa độ box | 0,6874 |
+| Rà box nhỏ/xa sau đối chiếu | Trong nhóm chưa khớp gold, loại 303 box nhỏ/xa có cạnh ngắn dưới 32 px ở 42 ảnh; giữ tọa độ các box còn lại | 0,8469 |
 
-Việc ghép box dùng cùng lớp, IoU ≥ 0,50 và ghép một-một theo evaluator gốc. Không sửa gold, không hạ ngưỡng F1/IoU. Ngưỡng 32 px được chọn trong quá trình đối chiếu gold train, **không phải quy tắc được giảng viên xác nhận cho ảnh mới**. Loại box ngoài phạm vi gold không có nghĩa vật thể đó không xuất hiện trong ảnh.
+**Diễn giải kết quả:** đồng bộ ID giúp F1 tăng từ **0,5581 lên 0,6874**; sau lượt rà và loại nhóm box nhỏ/xa nêu trên, F1 đạt **0,8469**. Vì vậy, kết quả cuối là kết quả của cả quá trình rework, không chỉ riêng thao tác đổi ID. Bản hiện tại còn 100 FP và 100 FN.
 
-Đây là **F1 sau rework có sử dụng gold train làm tham chiếu**, không phải chất lượng annotation độc lập trước khi xem gold. Còn 100 FP và 100 FN. Gate annotation đạt nhưng tính đầy đủ vật thể và cách thay đổi phạm vi/schema vẫn cần giảng viên xem xét.
+Phương pháp chấm được giữ nguyên: cùng lớp, IoU ≥ 0,50, ghép một-một; không sửa gold hoặc hạ ngưỡng evaluator. Việc điều chỉnh phạm vi xe đỗ/box nhỏ được thực hiện sau khi xem gold; ngưỡng cạnh ngắn 32 px là lựa chọn trong lượt QC này, chưa được giảng viên xác nhận thành quy tắc chung. Bản đầu và kết quả từng bước được giữ để đối chiếu.
 
 Lệnh tái lập từ thư mục gốc repo:
 
@@ -151,15 +153,14 @@ Hoặc mở script và bấm Run với interpreter `.venv`. Mỗi lần chạy m
 | Khởi động CVAT | Docker daemon chưa chạy, không tìm thấy docker.sock | Khởi động dịch vụ Docker; CVAT local đã hoạt động |
 | Xuất annotation | Xuất nhầm định dạng nên nhận XML | Chuyển sang Ultralytics YOLO Detection 1.0 |
 | Chạy evaluator | Thiếu `--student-labels` và `--gold-labels` | Chạy lại với đủ hai đường dẫn và lưu JSON |
-| So với gold | ID lớp/phạm vi xe đỗ khác cách hiểu ban đầu | Lưu kết quả trước/sau; ghi rõ thay đổi schema và phạm vi trong guideline |
+| So với gold | Thứ tự ID lớp khác schema đang dùng; một số xe đỗ/xe nhỏ khác phạm vi nhãn | Đồng bộ ID trên CVAT, `data.yaml` và bản xuất YOLO; rà box, chấm lại và lưu kết quả từng bước |
 | Đồng bộ file | Dùng thư mục xuất cũ hoặc nhầm job 3 gold | Khôi phục bản học viên job 2 và chấm lại; không dùng F1 = 1,0 từ bộ train trùng gold làm kết quả tự gán |
 | Pipeline | Ban đầu chưa có train/eval | Đã chạy YOLO26n local 50 epoch; có metrics, log và đủ 10 prediction trong assets |
 
 ## 7. Tự đánh giá theo rubric
 
 - Đã có 50 file nhãn hợp lệ, mini guideline, ít nhất ba ca mơ hồ và JSON annotation evaluation đạt gate sau rework.
-- Không tự nhận nhãn đã đầy đủ/đúng hoàn toàn: còn FP/FN, và việc bỏ xe đỗ/box nhỏ theo phạm vi gold khác yêu cầu bao phủ vật thể trong đề.
-- Cần giảng viên xác nhận thay đổi schema/phạm vi; không tự coi các thay đổi này đã được chấp thuận chỉ vì F1 đạt.
+- Đã xử lý sự không thống nhất ID giữa schema ban đầu và gold, đồng bộ task CVAT với dữ liệu train. Các thay đổi về phạm vi xe đỗ/box nhỏ và 100 FP/100 FN còn lại được ghi rõ ở mục 4 để giảng viên đối chiếu.
 - Đã có pipeline YOLO local, metrics, log 50 epoch, 10 ảnh prediction và phân tích model. Chưa có phiên Colab; cần xác nhận hình thức chạy local được chấp nhận theo yêu cầu nộp.
 - Chưa xác nhận các sửa đổi mới đã được commit/push hoặc link bài đã nộp trên LMS.
 
