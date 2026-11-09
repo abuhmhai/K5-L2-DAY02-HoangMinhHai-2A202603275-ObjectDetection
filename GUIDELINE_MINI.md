@@ -1,32 +1,48 @@
-# Mini guideline — bài làm cá nhân
+# Mini guideline — Hoàng Minh Hải, 2A202603275
 
-> Điền nội dung này trước khi bắt đầu gán nhãn. Giữ lại các quyết định sau khi self-QC.
+## 1. Schema và phạm vi sử dụng
 
-## Định nghĩa lớp
+| Lớp | ID bản đầu theo đề | ID bản rework hiện tại | Định nghĩa và phân biệt |
+|---|---:|---:|---|
+| car | 0 | 0 | Xe con, sedan, SUV, taxi và bán tải; không gồm xe buýt, xe tải hoặc mô tô. |
+| van | 3 | 1 | Van/minivan chở hàng hoặc chở người; phân biệt bằng thân xe và cấu trúc khoang, không chỉ dựa vào mục đích chở người/hàng. |
+| truck | 1 | 2 | Xe tải chở hàng, đầu kéo; xe bán tải vẫn thuộc car theo đề. |
+| bus | 2 | 3 | Xe buýt, minibus chở khách; không tự coi mọi van chở khách là bus. |
 
-| Lớp | Định nghĩa của bạn | Ví dụ/điểm phân biệt |
-| --- | --- | --- |
-| `car` (ID 0) | Xe con, sedan, SUV, taxi và xe bán tải. | Xe bán tải thuộc `car` theo schema của bài; không gán xe buýt, xe tải hoặc xe máy vào lớp này. |
-| `truck` (ID 1) | Xe tải chở hàng và xe đầu kéo. | Phân biệt với xe bán tải thuộc `car` và xe van thuộc `van`; nếu hình ảnh không đủ rõ để phân lớp thì ghi lại để hỏi giảng viên. |
-| `bus` (ID 2) | Xe buýt và minibus chở khách. | Phân biệt với van/minivan thuộc `van`; trường hợp khó phân biệt cần ghi tên ảnh và hỏi giảng viên, không tự đổi schema. |
-| `van` (ID 3) | Xe van và minivan dùng chở hàng hoặc chở người. | Không phân lớp chỉ dựa vào việc chở hàng hay chở người; khi không chắc giữa `van`, `bus` và `car`, ghi lại trường hợp để hỏi giảng viên. |
+**Bản rework hiện tại dùng `car=0, van=1, truck=2, bus=3`.** Học viên đã chọn đổi đồng bộ task CVAT và `data.yaml` sau khi đối chiếu ảnh/gold. Tên loại xe và tọa độ box được giữ khi đổi ID. Đây là thay đổi so với schema ghi trong đề, chưa có metadata lớp được giảng viên xác nhận; cần nêu rõ khi nộp.
 
-## Quy tắc chung
+## 2. Quy tắc vẽ box của bản annotation ban đầu
 
-- Box bám sát vật thể nghĩa là: mỗi xe hợp lệ có một khung chữ nhật riêng, ôm sát phần thân xe nhìn thấy được; hạn chế lấy thêm nền, mặt đường hoặc xe bên cạnh. Không gộp nhiều xe vào một box.
-- Vật thể bị che khuất: vẫn gán nhãn nếu phần nhìn thấy đủ để nhận diện lớp. Vẽ box theo phần nhìn thấy, không suy đoán toàn bộ phần bị che. Hai xe chồng lên nhau phải có hai box riêng.
-- Vật thể bị cắt bởi rìa ảnh: nếu nhận diện được lớp thì vẽ box quanh phần còn trong ảnh, chạm đúng mép ảnh; không kéo box vượt biên hoặc đoán phần nằm ngoài khung hình.
-- Vật thể rất nhỏ/mơ hồ: không tự đoán khi không xác định chắc được lớp. Ghi tên ảnh, tình huống và câu hỏi để hỏi giảng viên; cập nhật quyết định sau khi được làm rõ.
-- Xe đang đỗ: vẫn gán nhãn theo loại xe.
-- Ngoài phạm vi: không gán người đi bộ, xe đạp, xe máy/mô tô, biển báo, đèn giao thông, ảnh xe trên quảng cáo hoặc xe phản chiếu trong kính/gương.
-- Định dạng xuất: YOLO detection, thứ tự lớp cố định `car=0`, `truck=1`, `bus=2`, `van=3`. Mỗi ảnh có một file `.txt` cùng basename; ảnh không có xe hợp lệ vẫn có file rỗng.
+- Mỗi xe hợp lệ có một box riêng, ôm sát phần nhìn thấy; hạn chế nền, mặt đường và xe bên cạnh. Không gộp nhiều xe vào một box.
+- Xe bị che: vẫn gán nếu nhận diện được lớp từ phần nhìn thấy; không đoán toàn bộ phần bị che. Hai xe chồng nhau có hai box riêng.
+- Xe bị cắt mép: box bao phần còn trong ảnh, chạm biên khi cần; không vượt ra ngoài ảnh.
+- Xe nhỏ/mờ: phóng to để kiểm tra. Nếu vẫn không đủ thông tin phân lớp, ghi ca mơ hồ; không coi nhãn cũ hoặc kích thước box là bằng chứng về lớp.
+- Bản đầu có tính xe đang đỗ theo hướng dẫn đề. Việc bỏ xe đỗ và nhóm box nhỏ ở bản sau được mô tả riêng trong mục 4, không thay ngầm quy tắc gốc.
+- Không gán người, xe đạp, xe máy/mô tô, đèn/biển báo, ảnh quảng cáo hoặc hình phản chiếu của xe.
+- Xuất **Ultralytics YOLO Detection 1.0**. Mỗi ảnh có một file `.txt` cùng basename; mỗi dòng gồm `class_id x_center y_center width height`, bốn tọa độ chuẩn hóa. Ảnh không có đối tượng thuộc phạm vi vẫn có file rỗng.
 
-## Ghi lại quyết định cho ít nhất ba ca mơ hồ
+## 3. Các ca mơ hồ và tình trạng sau rework
 
-> Ghi các ca thực tế đã quan sát. Ca chưa chắc phải ghi rõ cần xác nhận; cập nhật quyết định sau khi tự kiểm tra hoặc hỏi giảng viên.
+| Ảnh | Quan sát | Quyết định ghi nhận | Giới hạn/căn cứ |
+|---|---|---|---|
+| drive_007 | Xe thân dạng van/minivan chở khách, dễ nhầm car hoặc bus | Giữ van; ID hiện tại 1 | Dựa trên cấu trúc thân xe trong ảnh. Không dùng tên gọi “limousine” làm bằng chứng duy nhất; chỉ đổi bus khi thấy rõ đặc điểm bus/minibus. |
+| drive_016 | Xe rất nhỏ ở mép trên, nhãn cũ là truck nhưng không rõ khoang hàng | Loại box trong bản rework thử, chưa chốt lớp thay thế | Không khẳng định đây là car/van/truck khi ảnh chưa đủ rõ. ID object trong ảnh chụp cũ chỉ dùng tra cứu lịch sử, có thể thay đổi khi import. |
+| drive_046 | Xe xa phía trên trái, nhãn cũ là car nhưng khó phân biệt van | Loại box nhỏ này ở bước căn phạm vi gold | Đây là quyết định về phạm vi của bản rework, không phải chứng minh xe không tồn tại hoặc xác định được lớp thật. |
+| drive_001 | Hàng xe đỗ sát lề bên trái có nhãn ở bản đầu nhưng không có trong gold tham chiếu | Bỏ nhóm xe được nhận định là đỗ trong lượt rework | Giả thuyết về phạm vi gold; không suy từ một ảnh rằng mọi xe đỗ đều bị gold bỏ qua. |
 
-| Ảnh | Tình huống | Quyết định cuối | Lý do theo schema |
-| --- | --- | --- | --- |
-| `drive_007` | Xe limousine kiểu Việt Nam (thân cao, dạng van/minivan chở khách), dễ nhầm với `car` hoặc `bus`. | Gán `van` (ID 3); không gán `car`. | Schema: `van` gồm van/minivan chở hàng hoặc chở người; `car` chỉ sedan/SUV/taxi/bán tải. “Limousine” ở VN thường là van cao chở khách → thuộc `van`, không thuộc `car`. Chỉ chuyển sang `bus` nếu rõ là xe buýt/minibus lớn hơn. |
-| `drive_016.jpg` | Xe nhỏ ở xa, sát mép trên ảnh (box 309 trong ảnh chụp CVAT), bị mờ nên khó phân biệt `truck`, `van` và `car`. Không thấy rõ cấu tạo khoang chở hàng. | Chưa chốt: nhãn hiện tại là `truck` (ID 1). Phóng to ảnh gốc và hỏi giảng viên trước khi xác nhận hoặc đổi lớp; không coi nhãn đang có là bằng chứng phân lớp đúng. | `truck` dành cho xe tải chở hàng/đầu kéo; `van` dành cho van/minivan; xe bán tải thuộc `car`. Cần dựa vào đặc điểm thân xe và khoang hàng nhìn thấy, không suy lớp từ kích thước box hoặc nhãn cũ. Box chỉ bao phần xe quan sát được và nằm trong biên ảnh. |
-| `drive_046.jpg` | Xe ở xa phía trên bên trái ảnh (box 1004 trong ảnh chụp CVAT), kích thước nhỏ và mờ, nằm sát các xe khác nên khó phân biệt `car` với `van`. | Chưa chốt: nhãn hiện tại là `car` (ID 0). Phóng to ảnh gốc để kiểm tra đặc điểm thân xe; nếu vẫn không rõ thì hỏi giảng viên trước khi giữ hoặc đổi lớp. Vẽ box riêng cho từng xe, không gộp các xe liền nhau. | `car` gồm xe con/SUV/taxi/bán tải; `van` gồm van/minivan. Không suy lớp chỉ từ kích thước xe trong ảnh, vì xe ở xa có box rất nhỏ. Chỉ dùng phần nhìn thấy để phân lớp và vẽ khung; không đoán phần bị che. |
+## 4. Nhật ký rework sau khi nhận gold
+
+1. Bổ sung một số xe bị bỏ sót/cắt mép và căn khung lệch, gồm các ảnh 005, 006, 010, 011, 015, 016, 017, 041 và 050.
+2. Theo yêu cầu học viên, thử loại 147 box được nhận định là xe đỗ và 2 box quá mơ hồ tại drive_016, tổng 149 box ở 19 ảnh. Giữ xe xếp hàng trong làn giao thông. Có một số box bị loại từng khớp gold, nên không kết luận gold bỏ toàn bộ xe đỗ.
+3. Đổi thứ tự ID sang car/van/truck/bus, giữ nguyên ý nghĩa lớp và hình học box. F1 tăng từ 0,5581 lên 0,6874 do đồng bộ ID.
+4. Đối chiếu cả 50 ảnh với gold bằng cùng lớp, IoU ≥ 0,50, ghép một-một. Trong các box chưa khớp, loại 303 box nhỏ/xa có cạnh ngắn dưới 32 px ở 42 ảnh; giữ nguyên tọa độ 653 box còn lại. Không chép tọa độ gold vào nhãn học viên.
+
+**Kết quả sau rework:** F1 = 0,8469; mean IoU = 0,8265; TP/FP/FN = 553/100/100. Nguồn là [annotation_evaluation.json](outputs/annotation_evaluation.json), chạy trên bản xuất **task 2 / job 2** của học viên. Task 4 / job 3 chỉ là gold tham chiếu, không được dùng bản xuất của nó làm nhãn train.
+
+## 5. Cách diễn giải và phần cần xác nhận
+
+- Đây là điểm **sau rework có tham chiếu gold train**, không phải điểm annotation độc lập trước khi xem gold hoặc kết quả dự đoán model trên eval/test.
+- Ngưỡng 32 px được chọn trong quá trình đối chiếu gold train, chưa phải quy tắc được giảng viên chấp thuận cho ảnh mới. Bỏ box ngoài phạm vi gold không có nghĩa xe đó không tồn tại.
+- Cần giảng viên xác nhận schema và việc thay đổi phạm vi xe đỗ/xe nhỏ so với đề; đạt gate số học không tự chứng minh đạt tiêu chí đầy đủ vật thể.
+- Giữ commit ban đầu và các kết quả trước/sau; không sửa gold hay hạ ngưỡng evaluator. Không đưa gold hoặc nhãn eval vào train.
+- Có AI hỗ trợ rà và thao tác gán/sửa nhãn. Học viên cần tự kiểm tra, khai báo đúng mức hỗ trợ trong [báo cáo cá nhân](report/individual/2A202603275_HoangMinhHai.md).

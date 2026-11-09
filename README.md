@@ -1,5 +1,7 @@
 # Bài thực hành Ngày 2 - Gán nhãn phát hiện vật thể cho ADAS
 
+> **Trạng thái bài làm cá nhân (09/11/2026):** xem [báo cáo của Hoàng Minh Hải](report/individual/2A202603275_HoangMinhHai.md). Annotation QC sau rework: F1 0,8469, mean IoU 0,8265. **Đã train YOLO26n local trong PyCharm 50 epoch**, mAP50 0.6550, mAP50–95 0.4089; có đủ 10 ảnh prediction. Schema/phạm vi rework và hình thức local thay Colab cần được giảng viên xác nhận.
+
 **Bài cá nhân.** Mỗi học viên tự làm và nộp bộ nhãn của mình. Hạn nộp: **11:59 trưa ngày hôm sau buổi lab (giờ Việt Nam, UTC+7)**. Với buổi ngày 09/11/2026, hạn nộp là **11:59 ngày 10/11/2026**. Nộp bài qua LMS tại [aithucchien.vinuni.edu.vn](https://aithucchien.vinuni.edu.vn).
 
 Repo đề bài: `K5-L2-Day02-ObjectDetection`, dùng chung cho K5 Level 2. Mỗi học viên tự nộp link repo bài làm trên [LMS AI Thực chiến](https://aithucchien.vinuni.edu.vn) bằng tài khoản cá nhân; tên repo và các file cần nộp ở [SUBMISSION.md](SUBMISSION.md).
@@ -34,7 +36,7 @@ Sau lab, bạn có thể:
 | 4 | [GUIDELINE_MINI.md](GUIDELINE_MINI.md) | Mẫu guideline cá nhân **bạn phải điền** | Điền **trước** khi gán nhãn (CP1) |
 | 5 | [RUBRIC.md](RUBRIC.md) | Tiêu chí chấm điểm và mức chất lượng | Đọc trước khi làm để biết cần đạt gì |
 | 6 | [SUBMISSION.md](SUBMISSION.md) | Cách đặt tên repo, cấu trúc nộp, xử lý kết quả Colab | Đối chiếu **trước khi nộp** |
-| 7 | [report/individual/MSSV_HoTen.md](report/individual/MSSV_HoTen.md) | Mẫu báo cáo cá nhân | Điền **cuối cùng**, tập hợp kết quả |
+| 7 | [report/individual/2A202603275_HoangMinhHai.md](report/individual/2A202603275_HoangMinhHai.md) | Mẫu báo cáo cá nhân | Điền **cuối cùng**, tập hợp kết quả |
 
 > Mẹo: đọc 1–3 và 5 trước buổi lab để nắm rõ ràng phải làm và chấm; điền 4 (guideline) trong buổi; đối chiếu 6 và điền 7 ở giai đoạn nộp.
 
@@ -45,7 +47,7 @@ Sau lab, bạn có thể:
 - `outputs/annotation_evaluation.json`: kết quả chấm sau khi giảng viên phát gold labels.
 - Link Colab đã chạy và ảnh/chỉ số đánh giá model trên tập `eval`.
 
-Điền [báo cáo cá nhân](report/individual/MSSV_HoTen.md) để tập hợp các đầu ra trên; mẫu báo cáo không thêm bài tập hoặc tiêu chí điểm mới.
+Điền [báo cáo cá nhân](report/individual/2A202603275_HoangMinhHai.md) để tập hợp các đầu ra trên; mẫu báo cáo không thêm bài tập hoặc tiêu chí điểm mới.
 
 ## Chuẩn bị và bắt đầu
 
@@ -55,7 +57,7 @@ Sau lab, bạn có thể:
 - Gán nhãn rồi **commit và push** `dataset/labels/train/` lên repo của bạn — đây là bản dữ liệu Colab sẽ tự clone.
 - Trên Colab, mở notebook `notebooks/day2_annotation_to_yolo.ipynb` (từ trang GitHub của repo, mở bằng nút Colab, hoặc dán URL repo). Chọn runtime có GPU nếu được cấp. Cell đầu tự clone repo của bạn về Colab — không cần upload file hay zip.
 
-Đọc các file tài liệu theo thứ tự ở mục **Thứ tự đọc tài liệu** ở trên; khi chuẩn bị nộp, đối chiếu [SUBMISSION.md](SUBMISSION.md), [RUBRIC.md](RUBRIC.md) và [mẫu báo cáo](report/individual/MSSV_HoTen.md).
+Đọc các file tài liệu theo thứ tự ở mục **Thứ tự đọc tài liệu** ở trên; khi chuẩn bị nộp, đối chiếu [SUBMISSION.md](SUBMISSION.md), [RUBRIC.md](RUBRIC.md) và [mẫu báo cáo](report/individual/2A202603275_HoangMinhHai.md).
 
 ## Cấu trúc thư mục
 
@@ -104,3 +106,13 @@ python3 tools/evaluate_annotations.py \
 Bộ ảnh là một tập con ảnh cảnh giao thông CCTV (nguồn gốc UA-DETRAC, phát hành lại dưới giấy phép CC-BY-4.0) đã được biên tập cho mục đích giảng dạy. Ảnh được đổi tên tuần tự và re-encode để loại bỏ metadata; repository không chứa ID ảnh nguồn, URL, hay nhãn train gold. Không đảo ngược, truy vết hay dùng thông tin ngoài repo để tìm nhãn.
 
 Chỉ dùng ảnh và nhãn trong phạm vi bài học. Không bổ sung ảnh cá nhân, biển số, dữ liệu khách hàng hoặc dữ liệu nhạy cảm vào repository/Colab công khai.
+
+## Chạy YOLO local trong PyCharm
+
+Dùng interpreter `.venv` của dự án, mở `tools/train_yolo_local.py` và bấm Run, hoặc chạy:
+
+```bash
+./.venv/bin/python tools/train_yolo_local.py --device mps --epochs 50 --batch 4
+```
+
+Script dùng 50 ảnh train và 10 ảnh eval riêng, lưu best checkpoint trong `outputs/yolo26_runs/`, đánh giá lại và tạo prediction cùng assets báo cáo. Kết quả model nằm trong `outputs/model_eval_metrics.json`; F1 annotation vẫn nằm riêng ở `outputs/annotation_evaluation.json`. Pretrained checkpoint được tải từ nguồn Ultralytics khi chưa có trên máy.

@@ -1,6 +1,6 @@
 # Tiêu chí đánh giá Ngày 2 — Object Detection Annotation (100 điểm)
 
-Bài cá nhân, tổng điểm chính 100; bài này không có hạng mục bonus riêng. Cách đặt tên/nộp bài và deadline ở [SUBMISSION.md](SUBMISSION.md), quy định làm bài ở [RULES.md](RULES.md). [Báo cáo cá nhân](report/individual/MSSV_HoTen.md) tập hợp kết quả của các tiêu chí dưới đây, không có điểm cộng riêng cho độ dài báo cáo.
+Bài cá nhân, tổng điểm chính 100; bài này không có hạng mục bonus riêng. Cách đặt tên/nộp bài và deadline ở [SUBMISSION.md](SUBMISSION.md), quy định làm bài ở [RULES.md](RULES.md). [Báo cáo cá nhân](report/individual/2A202603275_HoangMinhHai.md) tập hợp kết quả của các tiêu chí dưới đây, không có điểm cộng riêng cho độ dài báo cáo.
 
 | Tiêu chí | Kết quả bài làm | Điểm |
 | --- | --- | ---: |

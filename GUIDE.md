@@ -2,7 +2,7 @@
 
 **Bài cá nhân.** Mỗi học viên tự làm và nộp bộ nhãn của mình. Hạn nộp: **11:59 trưa ngày hôm sau buổi lab (giờ Việt Nam, UTC+7)**. Với buổi ngày 09/11/2026, hạn nộp là **11:59 ngày 10/11/2026**. Kênh nộp theo thông báo của giảng viên.
 
-Nộp link repo trên LMS bằng tài khoản cá nhân. Tên repo/file và checklist nộp bài xem [SUBMISSION.md](SUBMISSION.md); điền [báo cáo cá nhân](report/individual/MSSV_HoTen.md) từ kết quả thực tế. Quy định làm bài ở [RULES.md](RULES.md), sản phẩm từng bước ở [CHECKPOINTS.md](CHECKPOINTS.md).
+Nộp link repo trên LMS bằng tài khoản cá nhân. Tên repo/file và checklist nộp bài xem [SUBMISSION.md](SUBMISSION.md); điền [báo cáo cá nhân](report/individual/2A202603275_HoangMinhHai.md) từ kết quả thực tế. Quy định làm bài ở [RULES.md](RULES.md), sản phẩm từng bước ở [CHECKPOINTS.md](CHECKPOINTS.md).
 
 ## 0. Phân bổ thời gian (4 giờ)
 
